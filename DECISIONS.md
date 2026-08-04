@@ -116,6 +116,19 @@ pero **la elección del envío final se mide sobre el conjunto completo**, aunqu
 cueste 3 horas de cómputo. El coste de no hacerlo era mandar el peor de los dos
 modelos al leaderboard privado.
 
+## ROG-012 · Más datos de entrenamiento no mejoran el GBM (2026-08-04)
+
+Último intento del día 4: reentrenar el árbitro con **574 pozos en vez de 380**
+(+51%) y validarlo con OOF sobre los 770 (`research/v9e_gbm770.py`), para tener
+un número directamente comparable y evitar el sesgo de subconjunto de ROG-011.
+
+**Medido:** GBM OOF = 9,917 ft, peor que v7 (9,151). El diagnóstico está en los
+folds: `iters = 1, 2, 3, 4, 20` — el early stopping corta casi al instante. El
+GBM ya había saturado con 380 pozos; es un corrector ligero (mejora su base solo
+−0,13 ft), no un modelo limitado por datos. Añadir muestras no aporta.
+
+**Cierre:** agotada la última palanca identificada. v7 queda como envío principal.
+
 ## Descartes menores con número
 
 Multi-formación (explota a k=150: 44,0), kriging ordinario y RBF (12,76 y 14,76
