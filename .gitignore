@@ -1,0 +1,30 @@
+# Entornos y cachés
+.venv/
+__pycache__/
+*.pyc
+.numba_cache/
+
+# Datos de la competición: se descargan con `kaggle competitions download`
+# (1,3 GB). Se versiona el código que los usa, no el corpus.
+data/
+
+# Cachés de cómputo (7,8 GB): trayectorias del particle filter, matrices de
+# features del GBM, backtests. Todo reproducible ejecutando los scripts.
+research/*.npz
+research/*_cache/
+research/v4_multiseed_cache/
+research/v6_offset_cache/
+research/v9_pesos_bt50/
+lb/*.zip
+
+# Logs de ejecución: la evidencia relevante está citada en reports/ y DECISIONS.md
+*.log
+research/*.csv
+!research/ps_stats.csv
+
+# Submissions generadas
+submission.csv
+kernel/submission.csv
+
+# Leaderboard descargado: contiene nombres de usuario de terceros
+lb/

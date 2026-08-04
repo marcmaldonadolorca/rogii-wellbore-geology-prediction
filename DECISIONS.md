@@ -1,0 +1,103 @@
+# DECISIONS — kaggle-rogii
+
+Registro de decisiones y de los **negativos medidos**, que en este proyecto han
+sido la mitad del valor: cada avenida cerrada con números evitó meter ruido en el
+envío que cuenta.
+
+## ROG-001 · Formular el problema como interpolación de superficie (2026-07-30)
+
+**Medido:** `TVT = S_k(X,Y) − Z + C_well,k` con residuo std de 0,0065 ft en el
+100% de los pozos y las 6 formaciones. **Decisión:** abandonar el enfoque de
+serie temporal (extrapolar el dip) y tratarlo como reconstrucción de una
+superficie geológica + offset por pozo. Es el cimiento de todo lo demás.
+
+## ROG-002 · No usar datasets de artifacts ajenos (2026-07-30)
+
+La aglomeración 6,4-6,7 del leaderboard son forks de un pipeline compartido que
+carga modelos preentrenados de terceros (`ravaghi`, `fleongg`, `pilkwang`).
+**Decisión:** cero dependencias externas. Motivos: son *pickles* no auditables,
+el dueño puede borrarlos en plena re-ejecución, y adoptarlos nos clava en esa
+aglomeración sin ventaja propia. Coste asumido: renunciar a ~1,5 ft "gratis".
+
+## ROG-003 · Cero LB probing; selección por CV local (2026-07-30)
+
+Existe probing documentado en notebooks públicos (sumar constantes a pozos
+concretos calibrando contra el público). **Decisión:** los envíos solo evalúan
+candidatos genuinos; la selección se hace con el CV local de 770 pozos. El
+leaderboard público solo se usa para calibrar el factor local→LB.
+
+## ROG-004 · Métrica anisótropa para la superficie (2026-07-31)
+
+Los pozos son líneas casi paralelas; con métrica isótropa los *k* vecinos salen
+del mismo pozo contiguo en vez de dar sección transversal. **Medido:** rotar a la
+dirección principal (`theta = 2.278489`, PCA+11°) y estirar el eje paralelo
+(`aniso=16`) baja la superficie de 24,2 → 12,9 ft. Es la aportación original con
+más impacto y no aparece en ningún notebook público.
+
+## ROG-005 · Media simple entre semillas del PF, no softmax (2026-07-31)
+
+La receta pública pondera las semillas con `softmax(loglik/scale)`, scales
+{3,5,8,12}. **Medido:** con pocas semillas eso colapsa a *argmax* y empeora
+(14,03 vs 13,07 de la media simple). **Decisión:** media simple. Nota: con S=64
+el loglik sí discrimina (corr −0,34), pero la media sigue siendo competitiva y es
+más robusta.
+
+## ROG-006 · Fusión por varianza inversa dependiente del contexto (2026-08-03)
+
+En vez de un peso fijo entre superficie y PF, `w = σ_p²/(σ_s²+σ_p²)` calculado
+**por punto** con σ ajustadas en 200 pozos disjuntos. **Medido:** 9,978 → 9,145
+(k=150), y la mejora se concentra en el **tercil más aislado** (−1,67), que es el
+régimen del test oculto. Confirmado en LB: factor local→LB pasó a 1,00.
+Extensión 2D (`σ_s(nn, md_since)`): 9,145 → 8,949.
+
+## ROG-007 · El prefijo pre-PS no predice el post-PS (tres negativos)
+
+Probado por tres vías independientes, todas negativas:
+
+- **Offset por pozo** (2026-08-03): corr(offset del backtest, offset real) =
+  −0,05 con n=368. El oráculo dice que un solo offset por pozo vale 4,9 ft, pero
+  no es capturable. LightGBM captura ~3% de la varianza y no transfiere.
+- **Pesos por pozo** (2026-08-04): señal débil real (spearman +0,17, acierto de
+  signo 0,64) pero mejora máxima −0,12 ft, bajo el umbral de ruido pareado y con
+  IC95 que cruza cero.
+- **Selección dura por backtest**: no consolida entre subconjuntos.
+
+**Conclusión:** lo que distingue a un pozo después del PS no está escrito en su
+prefijo. Es el resultado negativo más importante del proyecto.
+
+## ROG-008 · El gamma-ray rastrea pero no localiza (2026-07-30)
+
+**Medido:** el typewell está perfectamente alineado (corr +0,814 en el prefijo),
+pero post-PS el pozo va horizontal dentro de una capa: sensibilidad 0,93 API/ft
+frente a 7,66 API de ruido ⇒ **1σ equivale a 8,3 ft de TVT**. Por eso fracasan
+todos los métodos de búsqueda global (MAP por ventanas 13,5 ft; NCC 29-35 ft) y
+funciona el filtrado secuencial (particle filter, 13,8). Explica por qué el
+enfoque bayesiano "correcto" que se diseñó al principio (HMM con emisión
+gaussiana) rendía tan poco.
+
+## ROG-009 · Criterio anti-ruido: consistencia entre subconjuntos (2026-08-04)
+
+Umbrales de ruido pareado medidos: 0,56 ft (k=60), 0,35 (k=150), 0,15 (770).
+**Decisión:** una mejora solo entra si es consistente en k=60 **y** k=150. Aplicado
+el último día, descartó dos candidatos que parecían ganadores:
+
+- **Covarianza tipo Markowitz** con 5 señales: −0,21 en k=150 pero **+0,28 en
+  k=60**. Las 9 variantes mejoraban en k=150 (parecía señal), pero el flip de
+  signo lo delata.
+- **Mezcla de v7 y v8**: −0,03 en k=150, +0,06 en k=60.
+
+## ROG-010 · Envíos finales (2026-08-04)
+
+**Recomendación:** v8 principal (mejor CV en ambos subconjuntos, sin GBM, el más
+simple y menos sobreajustable) + v7 cobertura (empate en público,
+estructuralmente distinto). La decisión final es del propietario.
+
+## Descartes menores con número
+
+Multi-formación (explota a k=150: 44,0), kriging ordinario y RBF (12,76 y 14,76
+vs 12,68 del IDW), `C_well` con tendencia amortiguada (24 combinaciones, todas
+peores), nube más densa (subsample 3: peor y 20× más cara), HMM con velocidad en
+el estado (25,1 vs 24,4), polinomio de grado 2 al extrapolar (427-869 ft),
+detección de fallas (no existen: 0 saltos >20 ft en 200 pozos), σ_p recalibrada
+con S=64 (8,949 → 8,945, irrelevante), blend con geométrico por varianza inversa
+(−0,03, marginal).

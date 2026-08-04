@@ -1,0 +1,87 @@
+{
+ "doc": "Pesos adaptativos del blend v6 (linea pesos). Miembros en este ORDEN: [S=superficie aniso16 k24 theta=2.278489 LOWO, P=PF ancc multiseed S=64 media, G=dip anclado win700]. w(punto)=softmax de scores lineales: score_S=th[0]+z@th[1:4], score_P=0, score_G=th[4]+z@th[5:8], z=(feat-mu)/sd con feat=[log1p(nn_real), md_since/1000, sstd_PF]. nn_real=dist al punto mas cercano de la nube de train (arbol SIN escala aniso; en test no hace falta excluir nada). sstd_PF=std entre semillas por punto. TILT opcional por pozo: c2=round(0.65*cut), re-predecir [c2:cut] con S,P,G desde prefijo enmascarado, w2=NNLS(S,P) normalizado, wb=(1-lam)*[.45,.55,0]+lam*[w2,0] clip>=0 renorm, W_final=W_punto*[(wb_S/.45)^g,(wb_P/.55)^g,1] renormalizado por punto. lam=0.3 g=1.0. Fallback si el backtest no es computable (c2<60 o cola<30): sin tilt.",
+ "w_global": [
+  0.45,
+  0.55,
+  0.0
+ ],
+ "punto3": {
+  "theta": [
+   -0.045489935748003495,
+   -0.5486359269155369,
+   -0.2608223962851101,
+   0.47152140238325874,
+   -2.7911034349225257,
+   1.1580214926101466,
+   -1.2195678197500743,
+   0.6158170034800177
+  ],
+  "mu": [
+   5.860944866678284,
+   2.6152864021174,
+   4.376517308304172
+  ],
+  "sd": [
+   1.0801201364665467,
+   1.6986350029262551,
+   4.800478978311726
+  ],
+  "cols": [
+   0,
+   1,
+   2
+  ]
+ },
+ "punto3_isoW": {
+  "theta": [
+   -0.04264327283926204,
+   -0.6772310181999004,
+   -0.34783088677704455,
+   0.5015966380197138,
+   -2.5517765369295122,
+   0.8224852161752721,
+   -1.449097706970719,
+   0.6606291007162862
+  ],
+  "mu": [
+   5.860944866678284,
+   2.6152864021174,
+   4.376517308304172
+  ],
+  "sd": [
+   1.0801201364665467,
+   1.6986350029262551,
+   4.800478978311726
+  ],
+  "cols": [
+   0,
+   1,
+   2
+  ]
+ },
+ "tilt": {
+  "lam": 0.3,
+  "g": 1.0,
+  "bt_frac": 0.65,
+  "pf_seeds_backtest": 16
+ },
+ "medido": {
+  "rig_base_k150_P64": 9.978,
+  "rig_base_k60_P64": 10.147,
+  "punto3_k150": 9.063,
+  "punto3_k60": 9.898,
+  "punto3_live_cv_k150": 9.063,
+  "punto3_live_proxy_k150": 9.096,
+  "isoW_k150": 9.034,
+  "isoW_k60": 9.925,
+  "punto3_tilt_k150": 8.862,
+  "punto3_tilt_k60": 9.835,
+  "isoW_tilt_k150": 8.846,
+  "isoW_tilt_k60": 9.844,
+  "quintil_nn_mas_aislado_k150": {
+   "base": 13.53,
+   "punto3": 12.15,
+   "isoW_tilt": 11.23
+  }
+ }
+}
