@@ -7,10 +7,8 @@
 - **Los dos candidatos finales YA están enviados y son seleccionables.** Pase lo
   que pase con el resto, el resultado está asegurado.
 - **Próxima acción (del propietario, el 5-ago):** marcar en Kaggle los 2 envíos
-  que cuentan para el privado. Recomendación: **v8 principal** (mejor CV en los
-  dos subconjuntos, sin GBM, el más simple) + **v7 cobertura** (empate en
-  público, estructuralmente distinto: si el privado castiga una filosofía, la
-  otra cubre).
+  que cuentan para el privado. Recomendación: **v7 principal** + **v8 cobertura**
+  (ver ROG-010; la recomendación se invirtió al medir sobre los 770 pozos).
 
 ## Progresión medida
 
@@ -25,9 +23,17 @@
 | v7 | blend adaptativo 1D + GBM refit | 9,03 | **9,072** |
 | **v8** | **blend adaptativo σ 2D, sin GBM** | **8,95** | **9,079** |
 
-Veredicto de máxima potencia (770 pozos, umbral de ruido 0,15):
-**v8 = 9,792 ft**. La medición equivalente de v7 quedó a medias al cierre
-(`research/v9d_final770.py v7`, ~90 min); v8 ya gana a v7 en k=60 y k=150.
+Veredicto de máxima potencia (**770 pozos**, umbral de ruido 0,15):
+
+| | 770 pozos | proxy LB | LB real |
+|---|---|---|---|
+| **v7 (GBM sobre base adapt)** | **9,151** | **9,794** | **9,072** |
+| v8 (blend adaptativo 2D) | 9,792 | 10,628 | 9,079 |
+
+**v7 gana por 0,64 ft**, cuatro veces el umbral. Esto **invierte** la lectura de
+los subconjuntos (v8 ganaba en k=60 y k=150): esos 150 pozos no eran
+representativos del conjunto. Las tres evidencias independientes —770 pozos,
+proxy y leaderboard real— coinciden ahora en v7. Lección registrada en ROG-011.
 
 Factor local→LB: **1,00** desde el v7 (el modelo adaptativo transfiere sin
 pérdida). Al principio era 1,18 y bajó al reducir el peso de la parte espacial:

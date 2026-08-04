@@ -86,11 +86,35 @@ el último día, descartó dos candidatos que parecían ganadores:
   signo lo delata.
 - **Mezcla de v7 y v8**: −0,03 en k=150, +0,06 en k=60.
 
-## ROG-010 · Envíos finales (2026-08-04)
+## ROG-010 · Envíos finales (2026-08-04, corregida el mismo día)
 
-**Recomendación:** v8 principal (mejor CV en ambos subconjuntos, sin GBM, el más
-simple y menos sobreajustable) + v7 cobertura (empate en público,
-estructuralmente distinto). La decisión final es del propietario.
+**Recomendación final: v7 principal + v8 cobertura.**
+
+La recomendación inicial era la contraria (v8 principal), basada en que v8 ganaba
+en k=60 y k=150. La medición sobre los **770 pozos** la invirtió:
+
+| | 770 pozos | proxy LB | LB real |
+|---|---|---|---|
+| **v7** | **9,151** | **9,794** | **9,072** |
+| v8 | 9,792 | 10,628 | 9,079 |
+
+v7 gana por 0,64 ft (umbral de ruido a esa escala: 0,15) y las tres evidencias
+independientes coinciden. Se mantienen los dos como envíos finales porque son
+estructuralmente distintos —uno corrige con árboles, el otro pondera por
+varianza—: si el privado castiga una filosofía, la otra cubre.
+
+## ROG-011 · Un subconjunto de validación puede mentir aunque sea determinista (2026-08-04)
+
+El harness usaba subconjuntos deterministas (k=60, k=150) para poder comparar
+variantes de forma pareada, lo cual es correcto y necesario. Pero **la elección
+entre dos modelos finales se hizo mal con ellos**: v8 ganaba en ambos y perdió
+por 0,64 ft en los 770. Los 150 pozos, aun estratificados por `n_pred`, no
+representaban la distribución completa.
+
+**Regla:** las decisiones intermedias pueden tomarse en subconjuntos (por coste),
+pero **la elección del envío final se mide sobre el conjunto completo**, aunque
+cueste 3 horas de cómputo. El coste de no hacerlo era mandar el peor de los dos
+modelos al leaderboard privado.
 
 ## Descartes menores con número
 
