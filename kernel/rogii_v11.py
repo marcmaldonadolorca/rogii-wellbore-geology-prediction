@@ -1,4 +1,4 @@
-"""ROGII wellbore v8 — blend ADAPTATIVO por varianza inversa + GBM refit + capas.
+"""ROGII wellbore v11 — blend ADAPTATIVO por varianza inversa + GBM refit + capas.
 
 Cambio de fondo vs v6: el peso superficie/PF deja de ser fijo (0.45/0.55) y se
 decide POR PUNTO por varianza inversa, con dos curvas de error ajustadas en 200
@@ -83,30 +83,6 @@ SIG_S = np.array([8.89919702, 9.37233619, 8.43532995, 7.87490051, 8.99296893,
 SIG_P = np.array([2.09432202, 4.53292334, 6.81320383, 8.70951537, 10.5740661,
                   12.63210315, 15.30935841, 15.98209675, 17.81102521,
                   12.38879848])
-
-# sigma_s 2D multiplicativa (filas=NN_BINS, cols=MD_BINS; v8_sig2d, 8.949 k150)
-S_MULT = np.array([[ 2.7088,  4.6677,  5.9275,  6.6262,  6.6176,  7.2821, 12.1578, 11.3962, 11.4693,
-  11.21  ],
- [ 2.8529,  4.9159,  6.2427,  6.9785,  6.9694,  7.6693, 12.8041, 12.0021, 12.0791,
-  11.806 ],
- [ 2.5676,  4.4244,  5.6186,  6.2808,  6.2727,  6.9025, 11.524 , 10.8021, 10.8714,
-  10.6257],
- [ 2.397 ,  4.1305,  5.2453,  5.8635,  5.8559,  6.4439, 10.7584, 10.0845, 10.1492,
-   9.9197],
- [ 2.7374,  4.7169,  5.99  ,  6.696 ,  6.6873,  7.3588, 12.2859, 11.5162, 11.5901,
-  11.3281],
- [ 3.3686,  5.8046,  7.3712,  8.24  ,  8.2293,  9.0557, 15.1188, 14.1717, 14.2627,
-  13.9402],
- [ 3.4066,  5.8701,  7.4544,  8.333 ,  8.3222,  9.1579, 15.2894, 14.3316, 14.4236,
-  14.0975],
- [ 4.2087,  7.2522,  9.2096, 10.295 , 10.2817, 11.3141, 18.8894, 17.7061, 17.8197,
-  17.4169],
- [ 4.2414,  7.3085,  9.2811, 10.3749, 10.3615, 11.402 , 19.036 , 17.8436, 17.9581,
-  17.5521],
- [ 8.2884, 14.2822, 18.137 , 20.2746, 20.2484, 22.2816, 37.2001, 34.8697, 35.0935,
-  34.3002],
- [15.4601, 26.64  , 33.8301, 37.8173, 37.7685, 41.5609, 69.3876, 65.041 , 65.4583,
-  63.9786]])
 W_CLIP = (0.05, 0.9)
 
 # contact override (v4_capas)
@@ -122,7 +98,11 @@ ANCC_ALPHA, ANCC_RN, ANCC_PN = 0.998, 0.002, 0.005
 ANCC_IS, ANCC_RP, ANCC_RR = 0.3, 0.1, 0.001
 ANCC_IRS = 0.01
 PF_RESAMP = 0.5
-PF_GR_SIG_MIN, PF_GR_SIG_MAX, PF_GR_SIG_DEF = 10.0, 60.0, 30.0
+# v10: clip de sigma_GR recalibrado contra NUESTRO CV (barrido v9f).
+# Los valores 10/60 venian del notebook publico ajustado a otro leaderboard;
+# subirlos hace que el PF confie menos en el GR, coherente con el diagnostico
+# de que 1 sigma de ruido equivale a 8.3 ft de TVT. Medido: -0.173 ft (k=150).
+PF_GR_SIG_MIN, PF_GR_SIG_MAX, PF_GR_SIG_DEF = 20.0, 120.0, 30.0
 # PF-Z (pf_publico, para la feature Z del GBM)
 PF_N = 600
 PF_MOM, PF_VN, PF_PN = 0.993, 0.005, 0.01
@@ -428,26 +408,9 @@ def _icurve(x, bins, vals):
     return np.interp(x, c, vals)
 
 
-def _cent(bins):
-    return 0.5 * (bins[:-1] + np.minimum(bins[1:], bins[-2] * 2))
-
-
-def _interp2d(nn, md):
-    """Bilineal sobre centros de bin de S_MULT (misma malla que el ajuste)."""
-    cr, cc = _cent(NN_BINS), _cent(MD_BINS)
-    ri = np.clip(np.interp(nn, cr, np.arange(len(cr))), 0, len(cr) - 1)
-    ci = np.clip(np.interp(md, cc, np.arange(len(cc))), 0, len(cc) - 1)
-    r0 = np.clip(np.floor(ri).astype(int), 0, len(cr) - 2)
-    c0 = np.clip(np.floor(ci).astype(int), 0, len(cc) - 2)
-    fr, fc = ri - r0, ci - c0
-    g = S_MULT
-    return ((1-fr)*(1-fc)*g[r0, c0] + fr*(1-fc)*g[r0+1, c0]
-            + (1-fr)*fc*g[r0, c0+1] + fr*fc*g[r0+1, c0+1])
-
-
 def w_adapt(nn_aniso, md_since):
     """Peso de la superficie por punto: varianza inversa con curvas embebidas."""
-    ss = _interp2d(np.asarray(nn_aniso, float), np.asarray(md_since, float))
+    ss = _icurve(np.asarray(nn_aniso, float), NN_BINS, SIG_S)
     sp = _icurve(np.asarray(md_since, float), MD_BINS, SIG_P)
     return np.clip(sp ** 2 / (ss ** 2 + sp ** 2), *W_CLIP)
 
@@ -824,8 +787,7 @@ def process_well(df, tw, cut, field, sigs, booster, train_dir, exclude=None):
         except Exception as e:
             P64, wS = None, None
             print(f"    PF fallo ({e})", flush=True)
-    USE_GBM = False   # v8: el GBM no aporta sobre la base 2D (8.957 vs 8.949 k150)
-    if USE_GBM and booster is not None and surf_ok and tw_ok and P64 is not None and wS is not None:
+    if booster is not None and surf_ok and tw_ok and P64 is not None and wS is not None:
         try:
             X, aux = build_features(df, tw_t, tw_g, cut, field, hd, dist, ind)
             lk = aux["lk"]

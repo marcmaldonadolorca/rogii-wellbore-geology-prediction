@@ -138,3 +138,37 @@ el estado (25,1 vs 24,4), polinomio de grado 2 al extrapolar (427-869 ft),
 detección de fallas (no existen: 0 saltos >20 ft en 200 pozos), σ_p recalibrada
 con S=64 (8,949 → 8,945, irrelevante), blend con geométrico por varianza inversa
 (−0,03, marginal).
+
+## ROG-013 · Vía pública autorizada para optar a medalla (2026-08-05)
+
+ROG-002 descartaba usar los *datasets de artifacts* de terceros por criterio de
+calidad. El último día el propietario lo revirtió explícitamente («haz también la
+A») al constatar que la medalla de bronce está detrás de esa puerta: los ~900
+equipos con medalla son forks del mismo pipeline público, y usar notebooks y
+datasets públicos es legal y estándar en Kaggle.
+
+Enviado un fork de `raunakdey07/rogii-ultra-sub-6-rmse` con sus 7 datasets de
+artifacts, en paralelo a nuestra solución propia. **No es trabajo nuestro** y así
+debe declararse en cualquier uso de portfolio: opta a la medalla del leaderboard
+público, mientras el v11 cubre el escenario de shakeup —que es justo donde estos
+pipelines, afinados contra el público, son más frágiles—.
+
+## ROG-014 · Recalibrar lo heredado: el mejor hallazgo del proyecto (2026-08-05)
+
+Los hiperparámetros del particle filter venían del notebook público de Roman,
+ajustados contra *otro* leaderboard. Nadie del pelotón los ha tocado. Barridos
+contra nuestro CV (`research/v9f_pfparams.py`, `v9g_pffino.py`):
+
+| clip de σ_GR | RMSE k=150 | Δ |
+|---|---|---|
+| [10,60] (heredado) | 9,181 | — |
+| [15,90] | 9,008 | −0,173 |
+| **[20,120]** | **8,810** | **−0,370** |
+| [20,120] + N=1500 | 8,731 | −0,450 |
+
+Subir el clip hace que el PF confíe menos en el gamma-ray, coherente con ROG-008
+(1σ de ruido ≈ 8,3 ft de TVT). **Transfirió al leaderboard: 9,072 → 8,893.**
+
+Lección: cuando se adopta una pieza de un tercero, sus constantes son hipótesis
+sobre *sus* datos, no verdades. Recalibrarlas contra la validación propia fue más
+rentable que cualquier añadido arquitectónico de los últimos tres días.

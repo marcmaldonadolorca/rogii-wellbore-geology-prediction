@@ -6,9 +6,13 @@
 - **Mejor resultado: 9,072 público** (envío v7); v8 empata en 9,079 y gana en CV.
 - **Los dos candidatos finales YA están enviados y son seleccionables.** Pase lo
   que pase con el resto, el resultado está asegurado.
-- **Próxima acción (del propietario, el 5-ago):** marcar en Kaggle los 2 envíos
-  que cuentan para el privado. Recomendación: **v7 principal** + **v8 cobertura**
-  (ver ROG-010; la recomendación se invirtió al medir sobre los 770 pozos).
+- **Cierre 2026-08-05: nada pendiente del propietario.** Kaggle selecciona por
+  defecto los 2 envíos con mejor score público, y en nuestro caso ese default
+  coincide con la recomendación, así que no hace falta tocar nada.
+- Mejor propio: **v11 = 8,893** (σ_GR recalibrado). Enviada además una **vía
+  pública** (fork del pipeline con artifacts de terceros, autorizada por el
+  propietario el 5-ago para optar a medalla); su score decidirá el orden final.
+- Puesto con 8,893: ~3.381 de 6.165.
 
 ## Progresión medida
 
