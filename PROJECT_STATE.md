@@ -1,18 +1,32 @@
 # PROJECT_STATE — kaggle-rogii
 
-## Control actual
+## Control actual — CERRADO 2026-08-05
 
-- **Estado:** competición en su último día (cierra **2026-08-05 23:59 UTC**).
-- **Mejor resultado: 9,072 público** (envío v7); v8 empata en 9,079 y gana en CV.
-- **Los dos candidatos finales YA están enviados y son seleccionables.** Pase lo
-  que pase con el resto, el resultado está asegurado.
-- **Cierre 2026-08-05: nada pendiente del propietario.** Kaggle selecciona por
-  defecto los 2 envíos con mejor score público, y en nuestro caso ese default
-  coincide con la recomendación, así que no hace falta tocar nada.
-- Mejor propio: **v11 = 8,893** (σ_GR recalibrado). Enviada además una **vía
-  pública** (fork del pipeline con artifacts de terceros, autorizada por el
-  propietario el 5-ago para optar a medalla); su score decidirá el orden final.
-- Puesto con 8,893: ~3.381 de 6.165.
+**Resultado final: puesto 1.082 de 6.191 (top 17%)**, subiendo 2.299 puestos en
+el shakeup del leaderboard privado (veníamos del 3.381 en el público).
+
+| envío | público | **privado** | degradación |
+|---|---|---|---|
+| vía pública (artifacts de terceros) | 6,470 | **9,471** | **+3,00** |
+| v11 (nuestro, σ_GR recalibrado) | 8,893 | **9,422** | +0,53 |
+| v8 (nuestro, blend adaptativo 2D) | 9,079 | **9,167** | **+0,09** |
+| v7 (nuestro, + GBM) | 9,072 | 9,346 | +0,27 |
+| v6 | 10,032 | 9,666 | −0,37 |
+
+**La tesis del proyecto quedó demostrada con datos.** El pipeline público con
+artifacts —el que roza la medalla en el escaparate— se desplomó 3 puntos y acabó
+**por debajo de todos nuestros modelos**. Nuestra solución propia lo batió en el
+privado, que es donde se reparte el premio.
+
+El modelo más estable fue el **más simple**: v8 (blend adaptativo puro, sin GBM)
+degradó solo +0,09. Los que llevaban más maquinaria degradaron más.
+
+**Espina:** v8 era nuestro mejor privado pero no entró en los dos seleccionados,
+porque Kaggle elige por score público y ahí era el peor de los nuestros. El
+modelo más honesto era el que peor puntuaba en el escaparate.
+
+**Nada pendiente.** Siguiente concurso: Pokémon TCG Strategy (gate del propietario:
+*Join* antes del 6-sep; writeup 13-sep). Después, ARC Prize con intake tras la defensa.
 
 ## Progresión medida
 

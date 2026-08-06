@@ -172,3 +172,29 @@ Subir el clip hace que el PF confíe menos en el gamma-ray, coherente con ROG-00
 Lección: cuando se adopta una pieza de un tercero, sus constantes son hipótesis
 sobre *sus* datos, no verdades. Recalibrarlas contra la validación propia fue más
 rentable que cualquier añadido arquitectónico de los últimos tres días.
+
+## ROG-015 · El shakeup confirmó la tesis (2026-08-05, cierre)
+
+Resultado final: **puesto 1.082 de 6.191 (top 17%)**, +2.299 puestos respecto al
+público. Degradación público→privado por envío:
+
+| envío | público | privado | Δ |
+|---|---|---|---|
+| vía pública (artifacts) | 6,470 | 9,471 | **+3,00** |
+| v11 (nuestro) | 8,893 | 9,422 | +0,53 |
+| **v8 (nuestro, el más simple)** | 9,079 | **9,167** | **+0,09** |
+| v7 (nuestro, + GBM) | 9,072 | 9,346 | +0,27 |
+| v6 | 10,032 | 9,666 | −0,37 |
+
+Tres conclusiones que valen para la próxima competición:
+
+1. **Lo prestado se evapora.** El pipeline de artifacts, afinado contra el
+   leaderboard visible, perdió 3 puntos enteros y acabó por debajo de *todos*
+   nuestros modelos. La decisión original de ROG-002 era correcta para el privado.
+2. **La simplicidad predice estabilidad.** El orden de degradación siguió el orden
+   de complejidad: v8 (blend puro) +0,09 < v7 (+GBM) +0,27 < v11 (+GBM+σ) +0,53.
+   Cada capa de maquinaria compró score público y lo pagó en el privado.
+3. **Seleccionar por score público penaliza al modelo honesto.** v8 era nuestro
+   mejor privado y no entró en los dos finales porque era el peor en el escaparate.
+   Para la próxima: si el CV local es fiable (aquí lo era), merece la pena forzar
+   la selección manual del mejor por CV en vez de aceptar el default de Kaggle.
