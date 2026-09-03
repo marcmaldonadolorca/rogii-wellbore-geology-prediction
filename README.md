@@ -12,6 +12,8 @@ envía un notebook que Kaggle re-ejecuta contra un test oculto.
 puestos respecto al público (veníamos del 3.381) — el mayor shakeup de la
 competición en nuestro rango.
 
+![Público vs. privado: la vía de artifacts de terceros se desploma](docs/rogii-publico-vs-privado.png)
+
 | envío | público | **privado** | degradación |
 | --- | --- | --- | --- |
 | vía pública (artifacts de terceros, la que roza la medalla en el escaparate) | 6,470 | **9,471** | +3,00 |
