@@ -28,3 +28,6 @@ kernel/submission.csv
 
 # Leaderboard descargado: contiene nombres de usuario de terceros
 lb/
+
+# Notebook de benchmark con artifacts públicos de terceros (no es autoría propia)
+kernel_publico/
