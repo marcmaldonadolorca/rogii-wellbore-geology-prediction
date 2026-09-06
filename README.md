@@ -8,9 +8,13 @@ envía un notebook que Kaggle re-ejecuta contra un test oculto.
 
 ## Resultado
 
-**Puesto 1.082 de 6.191 (top 17%)** en el leaderboard privado, subiendo 2.299
-puestos respecto al público (veníamos del 3.381) — el mayor shakeup de la
-competición en nuestro rango.
+**Puesto 1.075 de 6.125 (top 17,6 %)** en el
+[leaderboard privado](https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction/leaderboard),
+subiendo 2.299 puestos respecto al público (partía del 3.381). Participación
+individual, sin equipo. Cifra consultada en
+[kaggle.com/marcmaldonado](https://www.kaggle.com/marcmaldonado/competitions) el
+2026-09-06; al cierre de la competición eran 1.082 de 6.191, y la diferencia son
+equipos retirados después.
 
 ![Público vs. privado: la vía de artifacts de terceros se desploma](docs/rogii-publico-vs-privado.png)
 
@@ -22,7 +26,7 @@ competición en nuestro rango.
 
 La tesis del proyecto quedó demostrada con datos: el pipeline de artifacts
 compartidos que domina el escaparate público se desploma 3 puntos en el privado
-y termina por debajo de todos nuestros modelos propios. El más simple (v8, sin
+y termina por debajo de todos mis modelos propios. El más simple (v8, sin
 GBM) fue también el más estable — degradó solo +0,09 mientras que añadir más
 maquinaria empeoraba la degradación.
 
