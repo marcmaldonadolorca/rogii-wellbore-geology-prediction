@@ -10,10 +10,11 @@ re-runs against a hidden test set.
 
 **1,075th of 6,125 (top 17.6%)** on the
 [private leaderboard](https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction/leaderboard),
-climbing 2,299 places from the public one (I started at 3,381). Solo entry, no team. Figure
-read from [kaggle.com/marcmaldonado](https://www.kaggle.com/marcmaldonado/competitions) on
-2026-09-06; at the close of the competition it was 1,082 of 6,191, and the difference is
-teams withdrawn afterwards.
+a climb of **+2,299 places** in the public-to-private shakeup. Solo entry, no team. At the
+close of the competition the rank was 1,082nd of 6,191, up from 3,381st on the public
+leaderboard (that is where the +2,299 comes from); the current figure, read from
+[kaggle.com/marcmaldonado](https://www.kaggle.com/marcmaldonado/competitions) on 2026-09-06,
+is lower because teams were withdrawn afterwards.
 
 ![Public versus private: the third-party artifact route collapses](docs/public-vs-private.png)
 
@@ -50,7 +51,13 @@ which is known at test time).
    neighbours all come from the same adjacent well instead of giving a cross-section. This
    change alone took the surface from 24.2 to 12.9 ft.
 2. **Multi-seed particle filter** over the stratigraphic level `U = TVT + Z`, following the
-   gamma-ray against the typewell (64 seeds, simple mean).
+   gamma-ray against the typewell (64 seeds, simple mean). This is the one piece of external
+   origin: the filter is ported from Roman's public standalone notebook
+   ([`research/pf_publico.py`](research/pf_publico.py)), with no third-party artifacts. Two
+   changes are mine: a simple mean across seeds instead of the public recipe's softmax
+   weighting (13.07 vs 14.03 ft locally, with few seeds), and recalibrating its inherited σ_GR clip against my
+   own validation (`[10, 60]` → `[20, 120]`), which took the public score from 9.072 to 8.893
+   (v11).
 3. **2D inverse-variance fusion** — each signal's weight is decided *per point*:
    `w_s = σ_p² / (σ_s² + σ_p²)`, with `σ_s(nn_dist, md_since)` in a 2D table and
    `σ_p(md_since)`. The surface rules where neighbouring wells are close; the particle filter
@@ -60,7 +67,8 @@ which is known at test time).
 
 ## What was measured and did not work
 
-Documented with numbers in [`DECISIONS.md`](DECISIONS.md). The essentials: **the pre-PS prefix
+Documented with numbers in [`docs/internal/DECISIONS.md`](docs/internal/DECISIONS.md)
+(in Spanish; English summary in [`docs/internal/README.md`](docs/internal/README.md)). The essentials: **the pre-PS prefix
 does not predict post-PS behaviour**. It failed three times by different routes — per-well
 offset (corr −0.05), per-well weights (below threshold, CI crosses zero) and hard selection by
 backtest. Also dropped: global GR matching (the gamma-ray tracks but does not localise — 1σ of
@@ -94,3 +102,9 @@ and exposes `rmse_lb_proxy`, which anticipated the leaderboard to within 0.8%.
 
 The final self-contained submission is [`kernel/rogii_v11.py`](kernel/rogii_v11.py): a single
 file, with no external datasets and no third-party models.
+
+## Working notes
+
+The plan, the project state at the close and every decision with its measurement (including
+the negatives) are kept, in Spanish, in [`docs/internal/`](docs/internal/README.md), with an
+English summary.
